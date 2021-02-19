@@ -27,8 +27,10 @@ let myQuery = 'apple'
 let apiEndpoint = 'https://od-api.oxforddictionaries.com/api/v2/entries/en-us/'
 
 let fetchOptions = {
-    Origin: window.location.origin,
-    headers: { 'app_key': '78b02731e28e387cb8b9e364fb42accc', 'app_id':'7adeb056' }
+    headers: {
+      'app_key': '78b02731e28e387cb8b9e364fb42accc',
+      'app_id':'7adeb056'
+    }
 }
 
 const fetchData = async () => {
@@ -46,16 +48,12 @@ const fetchData = async () => {
 }
 
 const display = (item) => {
-
-        var d = document.createElement("div");
-        d.innerHTML =
-          '<h3>' + item.word + '</h3>' +
-          '<p>' + item.results[0].lexicalEntries[0].lexicalCategory.text + '</p>' +
-          '<p>' + item.results[0].lexicalEntries[0].entries[0].senses[0].definitions[0]+'</p>';
-        document.querySelector('#results').appendChild(d);
-
-
-
+      var d = document.createElement("div");
+      d.innerHTML =
+        '<h3>' + item.word + '</h3>' +
+        '<p>' + item.results[0].lexicalEntries[0].lexicalCategory.text + '</p>' +
+        '<p>' + item.results[0].lexicalEntries[0].entries[0].senses[0].definitions[0]+'</p>';
+      document.querySelector('#results').appendChild(d);
 }
 
 const download = (json) => {
@@ -69,7 +67,6 @@ const download = (json) => {
 
 fetchData().then(data => {
     if (data){
-
       display( data )
       download( data )
     }
