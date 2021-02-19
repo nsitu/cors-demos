@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>CORS Demo 3</title>
+  <style> body { font-family: sans-serif; text-align: center; } </style>
+</head>
+<body>
+<h1>CORS Demo 3</h1>
+<h2>Fetching Oxford Dictionary Data via a NodeJS Relay on Firebird</h2>
+<p>This file uses JavaScript fetch() to acquire and display JSON data from Oxford Dicitonary. Since the <a href="https://developer.oxforddictionaries.com/">Oxford API</a> does not include CORS headers, we have to add them ourselves. This script connects to a NodeJS relay app running on Firebird. The app makes the request on our behalf and forwards it with the appropriate CORS headers included. Working in this way has the added benefit of keeping our API key and password safely hidden from the front end.</p>
+
+<div id="results"></div>
+<div id="download"></div>
+<div id="errors"></div>
+
+<script>
+
+// Read more about JavaScript Fetch here:
+// https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
+
+let myQuery = 'apple'
+let apiEndpoint = 'https://ixd1734.firebird.sheridanc.on.ca/OxfordAPI/'
+
+const fetchData = async () => {
+  let response = await fetch( apiEndpoint + myQuery )
+  if (response.ok){ return response.json() }
+  else{
+    var p = document.createElement("p");
+    p.innerHTML = response.url + '<br/>' +
+      "Error: " + response.status;
+    document.querySelector('#errors').appendChild(p);
+  }
+}
+
+const display = (item) => {
+    var d = document.createElement("div");
+    d.innerHTML =
+      '<h3>' + item.word + '</h3>' +
+      '<p>' + item.results[0].lexicalEntries[0].lexicalCategory.text + '</p>' +
+      '<p>' + item.results[0].lexicalEntries[0].entries[0].senses[0].definitions[0]+'</p>';
+    document.querySelector('#results').appendChild(d);
+}
+
+const download = (json) => {
+    var a = document.createElement("a");
+    a.innerHTML = "Download All as JSON";
+    var file = new Blob([JSON.stringify(json)], {type: 'application/json'});
+    a.href = URL.createObjectURL(file);
+    a.download = 'all_data.json';
+    document.querySelector('#download').appendChild(a);
+}
+
+fetchData().then(data => {
+    if (data){
+      display( data )
+      download( data )
+    }
+})
+
+</script>
+</body>
+</html>

@@ -7,6 +7,8 @@ const app	= express();      // enable express
 app.use( cors() );          // make express attach CORS headers to responses
 app.use( express.json() );  // add json capabilities to our express app
 
+app.use('/OxfordAPI', express.static('public'))
+
 let fetchOptions = {
     headers: {
       'app_key': process.env.OXFORD_KEY,

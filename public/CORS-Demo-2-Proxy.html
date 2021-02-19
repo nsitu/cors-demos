@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>CORS Demo 2</title>
+  <style> body { font-family: sans-serif; text-align: center; } </style>
+</head>
+<body>
+<h1>CORS Demo 2</h1>
+<h2>Fetching Oxford Dictionary Data via a CORS Proxy</h2>
+<p>This file uses JavaScript fetch() to acquire and display JSON data from Oxford Dicitonary. Since the <a href="https://developer.oxforddictionaries.com/">Oxford API</a> does not include CORS headers, a workaround is needed. This script employs a CORS proxy to add the necessary headers. The proxy makes the request on our behalf and forwards it with the appropriate headers attached. You are welcome to use this proxy for your projects. If you want to set up your own, you can read up on it at <a href="https://www.npmjs.com/package/cors-anywhere">NPM<a> and on <a href="https://github.com/Rob--W/cors-anywhere">Github</a>.</p>
+
+<div id="results"></div>
+<div id="download"></div>
+<div id="errors"></div>
+
+<script>
+
+// Read more about JavaScript Fetch here:
+// https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
+
+let myQuery = 'apple'
+let corsProxy = 'https://ixd-cors.herokuapp.com/'
+let oxfordAPI = 'https://od-api.oxforddictionaries.com/api/v2/entries/en-us/'
+let APIendpoint = corsProxy + oxfordAPI + myQuery
+
+let fetchOptions = {
+    headers: {
+      'app_key': '78b02731e28e387cb8b9e364fb42accc',
+      'app_id':'7adeb056'
+    }
+}
+
+const fetchData = async () => {
+  let response = await fetch(
+       APIendpoint,
+       fetchOptions
+  )
+  if (response.ok){ return response.json() }
+  else{
+    var p = document.createElement("p");
+    p.innerHTML = response.url + '<br/>' +
+      "Error: " + response.status;
+    document.querySelector('#errors').appendChild(p);
+  }
+}
+
+const display = (item) => {
+    var d = document.createElement("div");
+    d.innerHTML =
+      '<h3>' + item.word + '</h3>' +
+      '<p>' + item.results[0].lexicalEntries[0].lexicalCategory.text + '</p>' +
+      '<p>' + item.results[0].lexicalEntries[0].entries[0].senses[0].definitions[0]+'</p>';
+    document.querySelector('#results').appendChild(d);
+}
+
+const download = (json) => {
+    var a = document.createElement("a");
+    a.innerHTML = "Download All as JSON";
+    var file = new Blob([JSON.stringify(json)], {type: 'application/json'});
+    a.href = URL.createObjectURL(file);
+    a.download = 'all_data.json';
+    document.querySelector('#download').appendChild(a);
+}
+
+fetchData().then(data => {
+    if (data){
+      display( data )
+      download( data )
+    }
+})
+
+</script>
+
+</body>
+</html>

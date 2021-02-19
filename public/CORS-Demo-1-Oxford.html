@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>CORS Demo 1</title>
+  <style> body { font-family: sans-serif; text-align: center; } </style>
+</head>
+<body>
+<h1>CORS Demo 1</h1>
+<h2>Attempting to Fetch Oxford Dictionary Data Directly</h2>
+<p>This file demonstrates security features of the browser as they relate to <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS">Cross Origin Resource Sharing</a> (CORS), and illustrates the browser following the <a href="https://developer.mozilla.org/en-US/docs/Web/Security/Same-origin_policy">Same Origin Policy</a>. The browser attempts to fetch data from the <a href="https://developer.oxforddictionaries.com/">Oxford Dictionary API</a>. Because the API does not provide any CORS headers, the browser refuses to display the data. This is a security feature, not a bug. See the browser console for details. </p>
+
+<div id="results"></div>
+<div id="download"></div>
+<div id="errors"></div>
+
+<script>
+
+// Read more about JavaScript Fetch here:
+// https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
+
+let myQuery = 'apple'
+let apiEndpoint = 'https://od-api.oxforddictionaries.com/api/v2/entries/en-us/'
+
+let fetchOptions = {
+    Origin: window.location.origin,
+    headers: { 'app_key': '78b02731e28e387cb8b9e364fb42accc', 'app_id':'7adeb056' }
+}
+
+const fetchData = async () => {
+  let response = await fetch(
+       apiEndpoint + myQuery,
+       fetchOptions
+  )
+  if (response.ok){ return response.json() }
+  else{
+    var p = document.createElement("p");
+    p.innerHTML = response.url + '<br/>' +
+      "Error: " + response.status;
+    document.querySelector('#errors').appendChild(p);
+  }
+}
+
+const display = (item) => {
+
+        var d = document.createElement("div");
+        d.innerHTML =
+          '<h3>' + item.word + '</h3>' +
+          '<p>' + item.results[0].lexicalEntries[0].lexicalCategory.text + '</p>' +
+          '<p>' + item.results[0].lexicalEntries[0].entries[0].senses[0].definitions[0]+'</p>';
+        document.querySelector('#results').appendChild(d);
+
+
+
+}
+
+const download = (json) => {
+    var a = document.createElement("a");
+    a.innerHTML = "Download All as JSON";
+    var file = new Blob([JSON.stringify(json)], {type: 'application/json'});
+    a.href = URL.createObjectURL(file);
+    a.download = 'all_data.json';
+    document.querySelector('#download').appendChild(a);
+}
+
+fetchData().then(data => {
+    if (data){
+
+      display( data )
+      download( data )
+    }
+})
+
+</script>
+
+</body>
+</html>
